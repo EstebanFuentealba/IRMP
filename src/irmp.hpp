@@ -705,9 +705,11 @@ static void                                     (*irmp_callback_ptr) (uint_fast8
 #endif // IRMP_USE_CALLBACK == 1
 
 #if IRMP_USE_COMPLETE_CALLBACK == 1
-static void (*irmp_complete_callback_function)(void);
-void irmp_register_complete_callback_function(void (*aCompleteCallbackFunction)(void)) {
+static void (*irmp_complete_callback_function)(void *context);
+static void *irmp_callback_context;
+void irmp_register_complete_callback_function(void (*aCompleteCallbackFunction)(void *context), void *context) {
     irmp_complete_callback_function = aCompleteCallbackFunction;
+    irmp_callback_context = context;
 }
 #endif // IRMP_USE_COMPLETE_CALLBACK == 1
 
@@ -5462,7 +5464,7 @@ uint_fast8_t irmp_ISR(void)
 
 #if IRMP_USE_COMPLETE_CALLBACK == 1
     if (irmp_complete_callback_function != NULL && irmp_ir_detected) {
-        irmp_complete_callback_function();
+        irmp_complete_callback_function(irmp_callback_context);
     }
 #endif
 
